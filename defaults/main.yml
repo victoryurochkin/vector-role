@@ -1,7 +1,21 @@
 ---
 vector_version: "0.38.0"
-vector_arch: "amd64"
-vector_package_url: "https://packages.timber.io/vector/{{ vector_version }}/vector_{{ vector_version }}-1_{{ vector_arch }}.deb"
+vector_arch_deb: "amd64"
+vector_arch_rpm: "x86_64"
+
+vector_base_url: "https://packages.timber.io/vector"
+
+vector_deb_package_name: >-
+  vector_{{ vector_version }}-1_{{ vector_arch_deb }}.deb
+
+vector_rpm_package_name: >-
+  vector-{{ vector_version }}-1.{{ vector_arch_rpm }}.rpm
+
+vector_deb_package_url: >-
+  {{ vector_base_url }}/{{ vector_version }}/{{ vector_deb_package_name }}
+
+vector_rpm_package_url: >-
+  {{ vector_base_url }}/{{ vector_version }}/{{ vector_rpm_package_name }}
 
 vector_config_dir: "/etc/vector"
 vector_config_file: "/etc/vector/vector.yaml"

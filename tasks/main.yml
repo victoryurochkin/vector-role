@@ -1,5 +1,5 @@
 ---
-- name: Install Vector dependencies
+- name: Install Vector dependencies on Debian family
   ansible.builtin.apt:
     name:
       - curl
@@ -7,19 +7,45 @@
     state: present
     update_cache: true
   become: true
+  when: ansible_os_family == "Debian"
+
+- name: Install Vector dependencies on RedHat family
+  ansible.builtin.raw: |
+    dnf install -y curl ca-certificates tar gzip
+  become: true
+  changed_when: false
+  when: ansible_os_family == "RedHat"
 
 - name: Download Vector deb package
   ansible.builtin.get_url:
-    url: "{{ vector_package_url }}"
+    url: "{{ vector_deb_package_url }}"
     dest: "/tmp/vector_{{ vector_version }}.deb"
     mode: "0644"
   become: true
+  when: ansible_os_family == "Debian"
 
-- name: Install Vector package
+- name: Install Vector deb package
   ansible.builtin.apt:
     deb: "/tmp/vector_{{ vector_version }}.deb"
     state: present
   become: true
+  when: ansible_os_family == "Debian"
+
+- name: Download Vector rpm package
+  ansible.builtin.raw: |
+    curl -L \
+      -o /tmp/vector_{{ vector_version }}.rpm \
+      "{{ vector_rpm_package_url }}"
+  become: true
+  changed_when: false
+  when: ansible_os_family == "RedHat"
+
+- name: Install Vector rpm package
+  ansible.builtin.raw: |
+    dnf install -y /tmp/vector_{{ vector_version }}.rpm
+  become: true
+  changed_when: false
+  when: ansible_os_family == "RedHat"
 
 - name: Create Vector config directory
   ansible.builtin.file:
@@ -38,11 +64,18 @@
     group: root
     mode: "0644"
   become: true
-  notify: Restart Vector
 
-- name: Enable and start Vector
+- name: Check Vector config
+  ansible.builtin.command: "vector validate {{ vector_config_file }}"
+  become: true
+  changed_when: false
+
+- name: Enable and start Vector service
   ansible.builtin.service:
     name: "{{ vector_service_name }}"
     state: started
     enabled: true
   become: true
+  when:
+    - ansible_service_mgr == "systemd"
+    - molecule_yml is not defined

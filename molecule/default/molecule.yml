@@ -1,0 +1,34 @@
+---
+dependency:
+  name: galaxy
+
+driver:
+  name: docker
+
+platforms:
+  - name: vector-ubuntu
+    image: ubuntu:latest
+    pre_build_image: true
+    command: /bin/bash
+    tty: true
+
+  - name: vector-oraclelinux
+    image: oraclelinux:8
+    pre_build_image: true
+    command: /bin/bash
+    tty: true
+
+provisioner:
+  name: ansible
+  playbooks:
+    prepare: prepare.yml
+    converge: converge.yml
+  inventory:
+    host_vars:
+      vector-ubuntu:
+        ansible_python_interpreter: /usr/bin/python3
+      vector-oraclelinux:
+        ansible_python_interpreter: /usr/bin/python3.9
+
+verifier:
+  name: ansible

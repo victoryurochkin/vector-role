@@ -5,11 +5,9 @@ sources:
     interval: 1
 
 sinks:
-  clickhouse:
-    type: clickhouse
+  console:
+    type: console
     inputs:
       - demo_logs
-    endpoint: "{{ vector_clickhouse_endpoint }}"
-    database: "{{ vector_clickhouse_database }}"
-    table: "{{ vector_clickhouse_table }}"
-    skip_unknown_fields: true
+    encoding:
+      codec: json

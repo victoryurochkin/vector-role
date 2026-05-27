@@ -1,0 +1,21 @@
+---
+- name: Prepare containers
+  hosts: all
+  gather_facts: false
+  become: false
+
+  tasks:
+    - name: Install Python and sudo on Ubuntu
+      ansible.builtin.raw: |
+        apt-get update
+        apt-get install -y python3 sudo
+      changed_when: false
+      when: inventory_hostname == "vector-ubuntu"
+
+    - name: Install Python 3.9 and sudo on OracleLinux
+      ansible.builtin.raw: |
+        dnf install -y oraclelinux-release-el8
+        dnf module enable -y python39
+        dnf install -y python39 python39-pip sudo
+      changed_when: false
+      when: inventory_hostname == "vector-oraclelinux"
