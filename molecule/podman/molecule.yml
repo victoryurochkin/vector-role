@@ -1,0 +1,26 @@
+---
+dependency:
+  name: galaxy
+
+driver:
+  name: podman
+
+platforms:
+  - name: vector-podman-ubuntu
+    image: ubuntu:latest
+    pre_build_image: true
+    command: /bin/bash
+    tty: true
+
+provisioner:
+  name: ansible
+  playbooks:
+    prepare: prepare.yml
+    converge: converge.yml
+  inventory:
+    host_vars:
+      vector-podman-ubuntu:
+        ansible_python_interpreter: /usr/bin/python3
+
+verifier:
+  name: ansible

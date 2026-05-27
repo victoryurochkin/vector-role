@@ -1,0 +1,38 @@
+---
+- name: Verify Vector role with Podman
+  hosts: all
+  become: true
+  gather_facts: true
+
+  tasks:
+    - name: Check Vector binary exists
+      ansible.builtin.command: vector --version
+      register: vector_version_result
+      changed_when: false
+
+    - name: Assert Vector version command is successful
+      ansible.builtin.assert:
+        that:
+          - vector_version_result.rc == 0
+          - "'vector' in vector_version_result.stdout"
+
+    - name: Check Vector config file exists
+      ansible.builtin.stat:
+        path: /etc/vector/vector.yaml
+      register: vector_config_file
+
+    - name: Assert Vector config exists
+      ansible.builtin.assert:
+        that:
+          - vector_config_file.stat.exists
+          - vector_config_file.stat.isreg
+
+    - name: Validate Vector config
+      ansible.builtin.command: vector validate /etc/vector/vector.yaml
+      register: vector_validate_result
+      changed_when: false
+
+    - name: Assert Vector config is valid
+      ansible.builtin.assert:
+        that:
+          - vector_validate_result.rc == 0

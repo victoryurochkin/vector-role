@@ -17,11 +17,12 @@
   when: ansible_os_family == "RedHat"
 
 - name: Download Vector deb package
-  ansible.builtin.get_url:
-    url: "{{ vector_deb_package_url }}"
-    dest: "/tmp/vector_{{ vector_version }}.deb"
-    mode: "0644"
+  ansible.builtin.raw: |
+    curl -L \
+      -o /tmp/vector_{{ vector_version }}.deb \
+      "{{ vector_deb_package_url }}"
   become: true
+  changed_when: false
   when: ansible_os_family == "Debian"
 
 - name: Install Vector deb package
